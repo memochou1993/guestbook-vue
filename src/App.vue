@@ -1,20 +1,18 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div>
-</template>
+	<div id="app">
+		<b-navbar toggleable type="dark" variant="dark" class="mb-3">
+			<b-navbar-toggle target="nav_text_collapse"></b-navbar-toggle>
+			<b-navbar-brand>BootstrapVue</b-navbar-brand>
+			<b-collapse is-nav id="nav_text_collapse">
+				<b-navbar-nav class="ml-auto">
+					<b-nav-item to="/">Home</b-nav-item>
+					<b-nav-item to="/signatures">Signatures</b-nav-item>
+				</b-navbar-nav>
+			</b-collapse>
+		</b-navbar>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+		<b-container>
+			<router-view/>
+		</b-container>
+	</div>
+</template>
