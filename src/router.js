@@ -6,9 +6,9 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/about',
-      name: 'about',
-      component: () => import('./views/About.vue')
+      path: '/',
+      name: 'home',
+      component: () => import('./views/Home.vue')
     },
     {
       path: '/signatures',

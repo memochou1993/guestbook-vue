@@ -1,79 +1,71 @@
 <template>
     <div>
-        <div>
-            <form method="post" @submit.prevent="onSubmit">
-                <fieldset>
-                    <legend class="text-center">GuestBook</legend>
+        <b-form class="mb-3" @submit="onSubmit" @reset="onReset">
+            <b-form-group
+                label="名字"
+                label-for="name"
+                description="">
+                <b-form-input
+                    id="name"
+                    type="text"
+                    v-model="signature.name"
+                    :class="{
+                        'is-valid': nameIsValid,
+                        'is-invalid': nameIsInvalid
+                    }"
+                    required>
+                </b-form-input>
+                <span class="invalid-feedback" v-if="nameIsInvalid">
+                    {{ errors.name[0] }}
+                </span>
+            </b-form-group>
+            
+            <b-form-group
+                label="信箱"
+                label-for="email"
+                description="">
+                <b-form-input
+                    id="email"
+                    type="email"
+                    v-model="signature.email"
+                    :class="{
+                        'is-valid': emailIsValid,
+                        'is-invalid': emailIsInvalid
+                    }"
+                    required>
+                </b-form-input>
+                <span class="invalid-feedback" v-if="emailIsInvalid">
+                    {{ errors.email[0] }}
+                </span>
+            </b-form-group>
 
-                    <div class="form-group">
-                        <label for="name">名字</label>
-                        <div>
-                            <input type="text"
-                                minlength="3"
-                                maxlength="30"
-                                id="name"
-                                :class="[
-                                    'form-control', {
-                                        'is-valid': nameIsValid,
-                                        'is-invalid': nameIsInvalid
-                                    }
-                                ]"
-                                v-model="signature.name"
-                                required>
-                            <span class="invalid-feedback" v-if="errors.name">{{ errors.name[0] }}</span>
-                        </div>
-                    </div>
+            <b-form-group
+                label="內容"
+                label-for="content"
+                description="">
+                <b-form-textarea
+                    id="content"
+                    v-model="signature.content"
+                    :class="{
+                        'is-valid': contentIsValid,
+                        'is-invalid': contentIsInvalid
+                    }"
+                    :rows="3"
+                    :max-rows="6"
+                    required>
+                </b-form-textarea>
+                <span class="invalid-feedback" v-if="contentIsInvalid">
+                    {{ errors.content[0] }}
+                </span>
+            </b-form-group>
+            
+            <b-button type="submit" variant="primary">送出</b-button>&nbsp;
+            <b-button type="reset" variant="danger">重設</b-button>
+        </b-form>
 
-                    <div class="form-group">
-                        <label for="email">信箱</label>
-                        <div>
-                            <input type="email"
-                                minlength="3"
-                                maxlength="30"
-                                id="email"
-                                :class="[
-                                    'form-control', {
-                                        'is-valid': emailIsValid,
-                                        'is-invalid': emailIsInvalid
-                                    }
-                                ]"
-                                v-model="signature.email"
-                                required>
-                            <span class="invalid-feedback" v-if="errors.email">{{ errors.email[0] }}</span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="content">訊息</label>
-                        <div>
-                            <textarea id="content"
-                                :class="[
-                                    'form-control', {
-                                        'is-valid': contentIsValid,
-                                        'is-invalid': contentIsInvalid
-                                    }
-                                ]"
-                                v-model="signature.content"
-                                required></textarea>
-                            <span class="invalid-feedback" v-if="errors.content">{{ errors.content[0] }}</span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </div>
-                    </div>
-                </fieldset>
-            </form>
-
-            <div class="alert alert-success alert-dismissible fade show" role="alert" v-if="saved">
-                <strong>成功！表單已送出！</strong>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        </div>
+        <b-alert show dismissible fade v-if="saved">
+            表單已送出！
+        </b-alert>
     </div>
 </template>
 
@@ -81,46 +73,45 @@
     export default {
         data() {
             return {
+                url: '/api/signatures',
                 signature: {
                     name: '',
                     email: '',
                     content: ''
+                },
+                validation: {
+                    name: /^[a-zA-Z0-9\u4e00-\u9fa5]{3,30}$/,
+                    email: /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+$/,
+                    content: /^.{3,30}$/
                 },
                 saved: false,
                 errors: []
             };
         },
         computed: {
-            nameIsValid() {
-                let reg = /^[a-zA-Z0-9\u4e00-\u9fa5]+$/;
-                return reg.test(this.signature.name.trim());
+            nameIsValid: function() {
+                return this.validation.name.test(this.signature.name.trim());
             },
-            nameIsInvalid() {
-                return (this.signature.name.trim() === '' && this.errors.name);
+            nameIsInvalid: function() {
+                return (!this.validation.name.test(this.signature.name.trim()) && this.errors.name);
             },
-            emailIsValid() {
-                let reg = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
-                return reg.test(this.signature.email.trim());
+            emailIsValid: function() {
+                return this.validation.email.test(this.signature.email.trim());
             },
-            emailIsInvalid() {
-                return (this.signature.email.trim() === '' && this.errors.email);
+            emailIsInvalid: function() {
+                return (!this.validation.email.test(this.signature.email.trim()) && this.errors.email);
             },
-            contentIsValid() {
-                let reg = /^.+$/;
-                return reg.test(this.signature.content.trim());
+            contentIsValid: function() {
+                return this.validation.content.test(this.signature.content.trim());
             },
-            contentIsInvalid() {
-                return (this.signature.content.trim() === '' && this.errors.content);
+            contentIsInvalid: function() {
+                return (!this.validation.content.test(this.signature.content.trim()) && this.errors.content);
             }
         },
         methods: {
             onSubmit() {
                 this.saved = false;
-                axios.post('guestbook.test/api/signatures', this.signature, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
+                this.axios.post(this.url, this.signature)
                     .then(({data}) => {
                         this.success()
                     })
@@ -130,12 +121,12 @@
             },
             success() {
                 this.saved = true;
-                this.reset();
+                this.onReset();
             },
             error(data) {
                 this.errors = data;
             },
-            reset() {
+            onReset() {
                 this.errors = [];
                 this.signature = {
                     name: '',

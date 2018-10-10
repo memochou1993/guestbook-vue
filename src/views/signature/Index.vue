@@ -1,20 +1,28 @@
 <template>
     <div>
-        <b-row>
+        <b-row class="mb-3">
             <b-col md="3" offset-md="9">
-                <b-form-select v-model="per_page" :options="options"/>
+                <b-form-select v-model="meta.per_page" :options="options"/>
             </b-col>
         </b-row>
 
-        <b-table striped hover :fields="fields" :items="data">
-            <template slot="action" slot-scope="data">
-                <b-button href="" size="sm" variant="danger" @click.prevent="destroy(data.item.id)">刪除</b-button>
+        <b-table striped hover :fields="fields" :items="signatures">
+            <template slot="action" slot-scope="signature">
+                <b-button size="sm" variant="danger" @click.prevent="destroy(signature.item.id)">刪除</b-button>
             </template>
         </b-table>
 
-        <div class="d-flex justify-content-center">
-            <b-pagination v-model="current_page" :limit="limit" :per-page="per_page" :total-rows="total"></b-pagination>
-        </div>
+        <b-pagination
+            align="center"
+            v-model="meta.current_page"
+            :first-text="meta.first_text"
+            :prev-text="meta.prev_text"
+            :next-text="meta.next_text"
+            :last-text="meta.last_text"
+            :limit="meta.limit"
+            :per-page="meta.per_page"
+            :total-rows="meta.total_rows">
+        </b-pagination>
     </div>
 </template>
 
@@ -22,42 +30,49 @@
     export default {
         data() {
             return {
-                options: [
-                    {value: 5, text: 5},
-                    {value: 10, text: 10},
-                    {value: 15, text: 15}
-                ],
-                fields: {
-                    id: '編號',
-                    name: '名字',
-                    content: '內容',
-                    action: ''
-                },
                 url: '/api/signatures',
-                data: [],
-                limit: 5,
-                current_page: 1,
-                per_page: 5,
-                total: 0
+                signatures: [],
+                meta: {
+                    current_page: 1,
+                    first_text: '第一頁',
+                    prev_text: '前一頁',
+                    next_text: '下一頁',
+                    last_text: '最後頁',
+                    limit: 7,
+                    per_page: 10,
+                    total_rows: 0
+                },
+                options: [
+                    { value: 5, text: 5 },
+                    { value: 10, text: 10 },
+                    { value: 15, text: 15 }
+                ],
+                fields: [
+                    { key: 'id', label: '編號' },
+                    { key: 'name', label: '名字' },
+                    { key: 'content', label: '內容' },
+                    { key: 'action', label: '' }
+                ]
             };
         },
         created() {
             this.fetch();
         },
         watch: {
-            current_page() {
+            'meta.current_page': function() {
                 this.fetch();
             },
-            per_page() {
+            'meta.per_page': function() {
                 this.fetch();
             }
         },
         methods: {
             fetch() {
-                this.axios.get(this.url + '?page=' + this.current_page + '&per_page=' + this.per_page)
+                console.log('載入!');
+                this.axios.get('/api/signatures' + '?page=' + this.meta.current_page + '&per_page=' + this.meta.per_page)
                     .then(({data}) => {
-                        this.data = data.data;
-                        this.total = data.meta.total;
+                        this.signatures = data.data;
+                        this.meta.total_rows = data.meta.total;
                     });
             },
             destroy(id) {
@@ -67,7 +82,7 @@
                             this.data = this.lodash.remove(this.data, function (data) {
                                 return data.id !== id;
                             });
-                            this.fetch(this.url + '?page=' + this.current_page);
+                            this.fetch(this.url + '?page=' + this.meta.current_page);
                         });
                 }
             }
