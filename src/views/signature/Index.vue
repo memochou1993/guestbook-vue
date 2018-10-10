@@ -68,7 +68,6 @@
         },
         methods: {
             fetch() {
-                console.log('載入!');
                 this.axios.get('/api/signatures' + '?page=' + this.meta.current_page + '&per_page=' + this.meta.per_page)
                     .then(({data}) => {
                         this.signatures = data.data;
