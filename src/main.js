@@ -11,7 +11,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 Vue.config.productionTip = false
 
 Vue.use(VueAxios, axios);
-axios.defaults.baseURL = 'http://guestbook.test';
+axios.defaults.baseURL = 'http://guestbook.epoch.tw';
 
 Vue.use(VueLodash, {
   name: 'lodash'
