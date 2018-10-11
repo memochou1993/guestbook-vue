@@ -1,6 +1,6 @@
 <template>
     <div>
-        <b-form class="mb-3" @submit="onSubmit" @reset="onReset">
+        <b-form class="mb-3" @submit.prevent="onSubmit" @reset="onReset">
             <b-form-group
                 label="名字"
                 label-for="name"
